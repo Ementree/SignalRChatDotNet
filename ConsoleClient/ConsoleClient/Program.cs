@@ -1,22 +1,34 @@
 ﻿using System;
-using Microsoft.AspNet.SignalR.Client;
+using System.Threading.Tasks;
+using ConsoleClient.Extensions;
+using ConsoleClient.Services;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ConsoleClient
 {
     class Program
     {
-        static void Main(string[] args)
+        static HubConnection InitConnection()
         {
-            var hubConnection = new HubConnection("http://localhost:5000");
-            var chat = hubConnection.CreateHubProxy("ChatHub");
-            chat.On<string, string>("broadcastMessage", (name, message) => 
-                { Console.Write(name + ": "); Console.WriteLine(message); });
-            hubConnection.Start().Wait();
-            string msg = null;
+            return ChatHubConnectionBuilder
+                .Build()
+                .AddOnReceiveMethods();
+        }
 
-            while ((msg = Console.ReadLine()) != null)
+        static async Task Main(string[] args)
+        {
+            var connection = InitConnection();
+            TerminalConfigurator.Configure();
+
+            await connection.StartAsync();
+
+            await connection.InvokeAsync("Authorize", connection.ConnectionId, "console", "pswd");
+
+            while (true)
             {
-                chat.Invoke("Send", "Console app", msg).Wait();
+                var msg = Console.ReadLine();
+                await connection.InvokeAsync("SendMessage", connection.ConnectionId, "console", msg);
             }
         }
     }
