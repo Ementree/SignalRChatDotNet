@@ -29,7 +29,7 @@ namespace SignalRServer.Hub
             }
             else
             {
-                answer = $"Welcome {userName}!";
+                answer = $"Welcome, {userName}!";
 
                 _authorizations.Add(connectionId);
                 await Clients.Caller.SendAsync("Authorize", answer, true);

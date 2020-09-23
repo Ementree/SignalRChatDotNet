@@ -1,4 +1,5 @@
 ﻿using System;
+using ConsoleClient.Clients;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ConsoleClient.Extensions
@@ -24,10 +25,8 @@ namespace ConsoleClient.Extensions
 
         private static void AddOnAuthorize(HubConnection hubConnection)
         {
-            hubConnection.On<string, bool>("Authorize", (answer, result) =>
-            {
-                Console.Write(answer);
-            });
+            hubConnection.On<string, bool>("Authorize",
+                TerminalChatClient.OnAuthorize);
         }
     }
 }
