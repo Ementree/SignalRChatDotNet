@@ -8,9 +8,12 @@ namespace SignalRServer.Hub
     public class ChatHub : Microsoft.AspNetCore.SignalR.Hub
     {
         // Тока не ржите...
+
         #region Authorization
+
         private static string _passwordHash = "pswd";
         private static HashSet<string> _authorizations;
+
         #endregion
 
         public ChatHub()
@@ -44,7 +47,7 @@ namespace SignalRServer.Hub
                 return;
             }
 
-            await Clients.All.SendAsync("SendMessage", userName, message);
+            await Clients.All.SendAsync("SendMessage", connectionId, userName, message);
         }
 
         public async Task DenySendingMessage(string userName)
