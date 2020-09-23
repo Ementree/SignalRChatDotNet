@@ -1,11 +1,16 @@
 <div class="container">
   <form [formGroup]="messageForm">
     <div class="form-group w-50">
-      <label for="name">User Name:</label>
-      <input type="text" class="form-control" [name]="'name'" [formControlName]="'name'">
-      <input type="text" class="form-control" [formControlName]="'message'">
+      <div class="form-inline">
+        <label>User Name:</label>
+        <input type="text" class="form-control ml-2" [name]="'name'" [formControlName]="'name'">
+      </div>
+      <div class="form-inline mt-1">
+        <label>Message:</label>
+        <input type="text" class="form-control ml-2 w-75" [formControlName]="'message'">
+      </div>
     </div>
-    <button (click)="sendMessage()" [disabled]="messageForm.invalid">Send message</button>
+    <button class="btn btn-outline-dark" (click)="sendMessage()" [disabled]="messageForm.invalid">Send message</button>
   </form>
   <ul>
     <li *ngFor="let message of userMessages | async">
