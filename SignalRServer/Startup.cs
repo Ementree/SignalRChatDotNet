@@ -24,7 +24,7 @@ namespace SignalRServer
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder => builder
-                    .WithOrigins("http://localhost:4200")
+                    .WithOrigins("http://localhost:4200", "https://signal-r-ng.herokuapp.com")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .SetIsOriginAllowed((x) => true)
