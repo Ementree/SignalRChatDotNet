@@ -1,5 +1,5 @@
 <div class="container">
-  <form [formGroup]="messageForm">
+  <form [formGroup]="messageForm" class="mb-2">
     <div class="form-group w-50">
       <div class="form-inline">
         <label>User Name:</label>
@@ -12,9 +12,11 @@
     </div>
     <button class="btn btn-outline-dark" (click)="sendMessage()" [disabled]="messageForm.invalid">Send message</button>
   </form>
-  <ul>
-    <li *ngFor="let message of userMessages | async">
-      {{message.userName}}: {{message.text}}
-    </li>
-  </ul>
+  <div class="scroll-box mb-3" #chatBox>
+    <ul>
+      <li *ngFor="let message of userMessages | async">
+        {{message.userName}}: {{message.text}}
+      </li>
+    </ul>
+  </div>
 </div>
