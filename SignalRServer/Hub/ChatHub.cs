@@ -40,10 +40,14 @@ namespace SignalRServer.Hub
 
         public async Task SendMessage(UserMessage message)
         {
-            if (message.Text.Length > 100 || message.Text.Length < 1 || 
+            if (message.Text.Length > 100 || message.Text.Length < 1 ||
                 message.UserName.Length > 20 || message.UserName.Length < 1)
+            {
                 await Clients.Caller.SendAsync("ReceiveMessage",
                     new UserMessage {Text = "Чел ты", UserName = "System: "});
+                return;
+            }
+
             await Clients.All.SendAsync("ReceiveMessage", message);
         }
 
