@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {SignalRService} from './services/signal-r.service';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {UserMessage} from './models/user-message';
@@ -9,11 +9,14 @@ import {BehaviorSubject} from 'rxjs';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewChecked {
   public userMessages: BehaviorSubject<UserMessage[]>;
+  @ViewChild('chatBox') private chatBox: ElementRef;
+
   constructor(private signalRService: SignalRService) {
     this.userMessages = signalRService.messages;
   }
+
   messageForm: FormGroup;
 
   sendMessage(): void {
@@ -26,6 +29,7 @@ export class AppComponent implements OnInit {
     };
     console.log(userMessage);
     this.signalRService.sendMessage(userMessage);
+    this.messageForm.get('message').setValue('');
   }
 
   ngOnInit(): void {
@@ -34,5 +38,12 @@ export class AppComponent implements OnInit {
       name: new FormControl('', [Validators.minLength(1), Validators.maxLength(20)]),
       message: new FormControl('', [Validators.minLength(1), Validators.maxLength(100)])
     });
+  }
+
+  ngAfterViewChecked(): void {
+    try {
+      this.chatBox.nativeElement.scrollTop = this.chatBox.nativeElement.scrollHeight;
+    } catch (err) {
+    }
   }
 }
