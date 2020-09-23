@@ -9,8 +9,8 @@ namespace SignalRServer.Hub
     {
         // Тока не ржите...
         #region Authorization
-        private const string PasswordHash = "pswd";
-        private HashSet<string> _authorizations;
+        private static string _passwordHash = "pswd";
+        private static HashSet<string> _authorizations;
         #endregion
 
         public ChatHub()
@@ -21,7 +21,7 @@ namespace SignalRServer.Hub
         public async Task Authorize(string connectionId, string userName, string passwordHash)
         {
             string answer;
-            if (PasswordHash != passwordHash)
+            if (_passwordHash != passwordHash)
             {
                 answer = "Wrong password!";
 
