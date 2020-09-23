@@ -14,7 +14,7 @@ export class SignalRService {
   }
 
   private hub: HubConnection;
-  public messages: BehaviorSubject<UserMessage[]>;
+  public messages: BehaviorSubject<UserMessage[]> = new BehaviorSubject<UserMessage[]>([]);
 
   startConnection(): void {
     this.hub = new HubConnectionBuilder()
@@ -22,12 +22,12 @@ export class SignalRService {
       .build();
     this.hub.start()
       .then(() => console.log('Connection opened'))
-      .catch(err => console.log('Error while starting connection: ' + err));
+      .catch(err => console.log('Error while starting connection: ', err));
     this.onMessageSend();
   }
 
   onMessageSend(): void {
-    this.hub.on('messageSend', (message: UserMessage) => {
+    this.hub.on('ReceiveMessage', (message: UserMessage) => {
       const messagesArr = this.messages.value;
       messagesArr.push(message);
       this.messages.next(messagesArr);
@@ -35,7 +35,7 @@ export class SignalRService {
   }
 
   sendMessage(userMessage: UserMessage): void {
-    this.hub.invoke('Send', userMessage).then(r => console.log('From sendMessage method', r));
+    this.hub.invoke('SendMessage', userMessage);
   }
 
 }
