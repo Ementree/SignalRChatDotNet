@@ -44,7 +44,7 @@ namespace SignalRServer.Hub
                 return;
             }
 
-            await Clients.All.SendAsync("SendMessage", userName, message);
+            await Clients.All.SendAsync("SendMessage", connectionId, userName, message);
         }
 
         public async Task DenySendingMessage(string userName)
