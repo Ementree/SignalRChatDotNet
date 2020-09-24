@@ -65,7 +65,7 @@ namespace ConsoleClient.Clients
 
         private static async Task ConsoleSendMessage()
         {
-            var userMessage = await TerminalConfigurator.GetUserMessage();
+            var userMessage = TerminalConfigurator.GetUserMessage();
 
             await ServerSendMessage(_userName, userMessage);
         }

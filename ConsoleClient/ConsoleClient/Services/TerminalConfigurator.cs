@@ -16,17 +16,19 @@ namespace ConsoleClient.Services
         private static int _currentPositionLeft;
         private static int _currentPositionTop;
 
-        private static string _cornerSymbol = "+";
-        private static string _horizontalSymbol = "-";
-        private static string _leftVerticalSymbol = "|  ";
-        private static string _rightVerticalSymbol = "  |";
+        private const int MessageBoxUpperLineOffsetCount = 5;
+        private const int MessageBoxOffsetCount = 4;
         
-        
+        private static int _messageBoxUpperLineOffset;
+        private static int _messageBoxOffset;
+
+        private const string CornerSymbol = "+";
+        private const string HorizontalSymbol = "-";
+        private const string LeftVerticalSymbol = "|  ";
+        private const string RightVerticalSymbol = "  |";
 
         private static readonly List<string> MessageHistory;
         private static readonly StringBuilder MessageStringBuilder;
-        private static readonly int UpperLineOffset;
-        private static readonly int MessageWindowOffset;
         private static readonly string EnterMessage;
 
         static TerminalConfigurator()
@@ -37,8 +39,8 @@ namespace ConsoleClient.Services
             MessageHistory = new List<string>();
             MessageStringBuilder = new StringBuilder();
 
-            UpperLineOffset = Console.WindowHeight - 5;
-            MessageWindowOffset = Console.WindowHeight - 4;
+            _messageBoxUpperLineOffset = Console.WindowHeight - MessageBoxUpperLineOffsetCount;
+            _messageBoxOffset = Console.WindowHeight - MessageBoxOffsetCount;
 
             EnterMessage = "Enter the message: ";
         }
@@ -74,8 +76,8 @@ namespace ConsoleClient.Services
 
             SetNewCursorPosition(_currentPositionLeft, _currentPositionTop);
 
-            var authorizationWindowWidth = _leftVerticalSymbol.Length + userNameMessage.Length + maxInputSize +
-                                           _rightVerticalSymbol.Length;
+            var authorizationWindowWidth = LeftVerticalSymbol.Length + userNameMessage.Length + maxInputSize +
+                                           RightVerticalSymbol.Length;
             var leftCornerStart = (Console.WindowWidth - authorizationWindowWidth) / 2 + 1;
             var rightCornerStart = (Console.WindowWidth + authorizationWindowWidth) / 2;
             WriteLineWithCorners(leftCornerStart, rightCornerStart);
@@ -83,21 +85,21 @@ namespace ConsoleClient.Services
             _currentPositionLeft = oldPositionLeft;
             _currentPositionTop = oldPositionTop;
 
-            var leftOffset = oldPositionLeft - userNameMessage.Length / 2 - _leftVerticalSymbol.Length - 3;
+            var leftOffset = oldPositionLeft - userNameMessage.Length / 2 - LeftVerticalSymbol.Length - 3;
             SetNewCursorPosition(leftOffset, _currentPositionTop);
-            Console.Write(_leftVerticalSymbol);
+            Console.Write(LeftVerticalSymbol);
             Console.Write(userNameMessage);
             WriteSymbols(" ", maxInputSize); //var userName = Console.ReadLine();
-            Console.Write(_rightVerticalSymbol); //
+            Console.Write(RightVerticalSymbol); //
             SetNewCursorPosition(leftOffset, ++_currentPositionTop);
-            Console.Write(_leftVerticalSymbol);
+            Console.Write(LeftVerticalSymbol);
             WriteSymbols(" ", userNameMessage.Length + maxInputSize);
-            Console.Write(_rightVerticalSymbol); //
+            Console.Write(RightVerticalSymbol); //
             SetNewCursorPosition(leftOffset, ++_currentPositionTop);
-            Console.Write(_leftVerticalSymbol);
+            Console.Write(LeftVerticalSymbol);
             Console.Write(userPasswordMessage);
             WriteSymbols(" ", maxInputSize); //var password = Console.ReadLine();
-            Console.Write(_rightVerticalSymbol); //
+            Console.Write(RightVerticalSymbol); //
 
             SetNewCursorPosition(0, ++_currentPositionTop);
             WriteLineWithCorners(leftCornerStart, rightCornerStart);
@@ -114,7 +116,7 @@ namespace ConsoleClient.Services
             };
         }
 
-        public static async Task<string> GetUserMessage()
+        public static string GetUserMessage()
         {
             var pressedKeyInfo = new ConsoleKeyInfo();
 
@@ -124,10 +126,10 @@ namespace ConsoleClient.Services
                 
                 Console.Clear();
                 ShowAllMessages();
-                SetNewCursorPosition(0, UpperLineOffset);
+                UpdateMessageBoxOffset();
+                SetNewCursorPosition(0, _messageBoxUpperLineOffset);
                 WriteLineWithCorners();
-
-                SetNewCursorPosition(0, MessageWindowOffset);
+                SetNewCursorPosition(0, _messageBoxOffset);
                 Console.Write(EnterMessage);
 
                 for (int i = 0; i < MessageStringBuilder.Length; i++)
@@ -156,10 +158,10 @@ namespace ConsoleClient.Services
         {
             Console.Clear();
             ShowAllMessages();
-            SetNewCursorPosition(0, UpperLineOffset);
+            SetNewCursorPosition(0, _messageBoxUpperLineOffset);
             WriteLineWithCorners();
 
-            SetNewCursorPosition(0, MessageWindowOffset);
+            SetNewCursorPosition(0, _messageBoxOffset);
             Console.Write(EnterMessage);
 
             for (int i = 0; i < MessageStringBuilder.Length; i++)
@@ -205,12 +207,18 @@ namespace ConsoleClient.Services
         private static void WriteLineWithCorners(params int[] cornerPoints)
         {
             for (int i = 0; i < Console.WindowWidth; i++)
-                Console.Write(cornerPoints.Contains(i) ? _cornerSymbol : _horizontalSymbol);
+                Console.Write(cornerPoints.Contains(i) ? CornerSymbol : HorizontalSymbol);
         }
 
         private static void WriteSymbols(string symbol, int count)
         {
             Console.Write(String.Concat(Enumerable.Repeat(symbol, count)));
+        }
+
+        private static void UpdateMessageBoxOffset()
+        {
+            _messageBoxUpperLineOffset = Console.WindowHeight - MessageBoxUpperLineOffsetCount;
+            _messageBoxOffset = Console.WindowHeight - MessageBoxOffsetCount;
         }
 
         private static bool IsSymbol(char keyChar)
