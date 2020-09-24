@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ConsoleClient.Extensions;
 using ConsoleClient.Services;
 using Microsoft.AspNetCore.SignalR.Client;
+using SignalRServer.Models;
 
 namespace ConsoleClient.Clients
 {
@@ -53,12 +54,18 @@ namespace ConsoleClient.Clients
 
         private static async Task ServerSendMessage(string userName, string message)
         {
-            await HubConnection.InvokeAsync("SendMessage", HubConnection.ConnectionId, userName, message);
+            var userMessage = new UserMessage
+            {
+                UserName = userName,
+                Text = message
+            };
+            
+            await HubConnection.InvokeAsync("SendMessage", userMessage);
         }
 
         private static async Task ConsoleSendMessage()
         {
-            var userMessage = TerminalConfigurator.GetUserMessage();
+            var userMessage = await TerminalConfigurator.GetUserMessage();
 
             await ServerSendMessage(_userName, userMessage);
         }
@@ -69,11 +76,9 @@ namespace ConsoleClient.Clients
             Console.Write(answer);
         }
 
-        public static void OnSendMessage(string connectionId, string userName, string message)
+        public static void OnReceiveMessage(UserMessage userMessage)
         {
-            Console.WriteLine("----------");
-            
-            TerminalConfigurator.AddMessageToStorage(connectionId,userName, message);
+            TerminalConfigurator.Notify(userMessage);
         }
     }
 }

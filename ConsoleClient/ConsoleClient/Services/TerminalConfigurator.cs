@@ -1,7 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using ConsoleClient.Classes;
+using SignalRServer.Models;
 
 namespace ConsoleClient.Services
 {
@@ -14,15 +20,27 @@ namespace ConsoleClient.Services
         private static string _horizontalSymbol = "-";
         private static string _leftVerticalSymbol = "|  ";
         private static string _rightVerticalSymbol = "  |";
+        
+        
 
-        private static List<string> messageHistory;
+        private static readonly List<string> MessageHistory;
+        private static readonly StringBuilder MessageStringBuilder;
+        private static readonly int UpperLineOffset;
+        private static readonly int MessageWindowOffset;
+        private static readonly string EnterMessage;
 
         static TerminalConfigurator()
         {
             _currentPositionLeft = Console.WindowWidth / 2;
             _currentPositionTop = Console.WindowHeight / 3;
 
-            messageHistory = new List<string>();
+            MessageHistory = new List<string>();
+            MessageStringBuilder = new StringBuilder();
+
+            UpperLineOffset = Console.WindowHeight - 5;
+            MessageWindowOffset = Console.WindowHeight - 4;
+
+            EnterMessage = "Enter the message: ";
         }
 
         public static void Configure()
@@ -39,7 +57,7 @@ namespace ConsoleClient.Services
         public static UserCredentials GetUserCredentials()
         {
             Console.Clear();
-            
+
             var userNameMessage = "User name:     ";
             var userPasswordMessage = "User password: ";
 
@@ -56,9 +74,9 @@ namespace ConsoleClient.Services
 
             SetNewCursorPosition(_currentPositionLeft, _currentPositionTop);
 
-            var authorizationWindowWidth = _leftVerticalSymbol.Length  + userNameMessage.Length + maxInputSize +
+            var authorizationWindowWidth = _leftVerticalSymbol.Length + userNameMessage.Length + maxInputSize +
                                            _rightVerticalSymbol.Length;
-            var leftCornerStart = (Console.WindowWidth -  authorizationWindowWidth) / 2 + 1;
+            var leftCornerStart = (Console.WindowWidth - authorizationWindowWidth) / 2 + 1;
             var rightCornerStart = (Console.WindowWidth + authorizationWindowWidth) / 2;
             WriteLineWithCorners(leftCornerStart, rightCornerStart);
 
@@ -86,7 +104,7 @@ namespace ConsoleClient.Services
 
             _currentPositionLeft = oldPositionLeft;
             _currentPositionTop = oldPositionTop;
-            
+
             userName = Console.ReadLine();
             password = Console.ReadLine();
             return new UserCredentials
@@ -96,34 +114,77 @@ namespace ConsoleClient.Services
             };
         }
 
-        public static string GetUserMessage()
+        public static async Task<string> GetUserMessage()
+        {
+            var pressedKeyInfo = new ConsoleKeyInfo();
+
+            while (pressedKeyInfo.Key != ConsoleKey.Enter)
+            {
+                //DisplayUpdate();
+                
+                Console.Clear();
+                ShowAllMessages();
+                SetNewCursorPosition(0, UpperLineOffset);
+                WriteLineWithCorners();
+
+                SetNewCursorPosition(0, MessageWindowOffset);
+                Console.Write(EnterMessage);
+
+                for (int i = 0; i < MessageStringBuilder.Length; i++)
+                {
+                    Console.Write(MessageStringBuilder[i]);
+                }
+
+                pressedKeyInfo = Console.ReadKey();
+
+                var keyChar = pressedKeyInfo.KeyChar;
+
+
+                if (IsSymbol(keyChar))
+                    MessageStringBuilder.Append(keyChar);
+                if (pressedKeyInfo.Key == ConsoleKey.Backspace && MessageStringBuilder.Length != 0)
+                    MessageStringBuilder.Remove(MessageStringBuilder.Length - 1, 1);
+            }
+
+            var message = MessageStringBuilder.ToString();
+            MessageStringBuilder.Clear();
+
+            return message;
+        }
+
+        private static void DisplayUpdate()
         {
             Console.Clear();
+            ShowAllMessages();
+            SetNewCursorPosition(0, UpperLineOffset);
+            WriteLineWithCorners();
 
+            SetNewCursorPosition(0, MessageWindowOffset);
+            Console.Write(EnterMessage);
+
+            for (int i = 0; i < MessageStringBuilder.Length; i++)
+            {
+                Console.Write(MessageStringBuilder[i]);
+            }
+        }
+
+        private static void ShowAllMessages()
+        {
             _currentPositionTop = 0;
             _currentPositionLeft = 0;
-            SetNewCursorPosition(_currentPositionLeft,_currentPositionTop);
+            SetNewCursorPosition(_currentPositionLeft, _currentPositionTop);
 
-            foreach (var msg in messageHistory)
+            foreach (var msg in MessageHistory)
             {
                 Console.Write(msg);
                 SetNewCursorPosition(_currentPositionLeft, ++_currentPositionTop);
             }
-            
-            
-            SetNewCursorPosition(0, Console.WindowHeight - 5);
-            WriteLineWithCorners();
-            SetNewCursorPosition(0, Console.WindowHeight - 4);
-            Console.Write("Enter the message: ");
-            var message = Console.ReadLine();
-
-            return message;
         }
-        
 
-        public static void AddMessageToStorage(string connectionId, string userName, string message)
+        public static void Notify(UserMessage userMessage)
         {
-            messageHistory.Add($"({connectionId}){userName} : {message}");
+            MessageHistory.Add($"{userMessage.UserName} : {userMessage.Text}");
+            //DisplayUpdate();
         }
 
         private static void SetNewCursorPosition(int newPositionLeft, int newPositionTop)
@@ -138,11 +199,7 @@ namespace ConsoleClient.Services
 
         private static void SetConsoleWindowBufferSize(int newWidth, int newHeight)
         {
-            Console.SetBufferSize(newWidth, newHeight);
-        }
-
-        private static void WritAuthorizationUpperLine()
-        {
+            Console.SetBufferSize(newWidth, 1000);
         }
 
         private static void WriteLineWithCorners(params int[] cornerPoints)
@@ -154,6 +211,14 @@ namespace ConsoleClient.Services
         private static void WriteSymbols(string symbol, int count)
         {
             Console.Write(String.Concat(Enumerable.Repeat(symbol, count)));
+        }
+
+        private static bool IsSymbol(char keyChar)
+        {
+            var acceptedSymbols = new char[] {'+', '=', '|', '/', '`', '~', '$', '^'};
+
+            return char.IsLetterOrDigit(keyChar) || char.IsPunctuation(keyChar) || char.IsWhiteSpace(keyChar) ||
+                   acceptedSymbols.Contains(keyChar);
         }
     }
 }

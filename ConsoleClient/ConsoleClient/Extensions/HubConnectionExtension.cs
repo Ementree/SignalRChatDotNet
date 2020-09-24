@@ -1,6 +1,7 @@
 ﻿using System;
 using ConsoleClient.Clients;
 using Microsoft.AspNetCore.SignalR.Client;
+using SignalRServer.Models;
 
 namespace ConsoleClient.Extensions
 {
@@ -16,10 +17,7 @@ namespace ConsoleClient.Extensions
 
         private static void AddOnSendMessage(HubConnection hubConnection)
         {
-            hubConnection.On<string, string, string>("SendMessage", (connectionId, userName, message) =>
-            {
-                Console.WriteLine(userName);
-            });
+            hubConnection.On<UserMessage>("ReceiveMessage", TerminalChatClient.OnReceiveMessage);
         }
 
         private static void AddOnAuthorize(HubConnection hubConnection)
