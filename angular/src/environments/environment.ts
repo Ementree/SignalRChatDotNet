@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  hubUrl: 'localhost:5000'
+  hubUrl: 'https://localhost:5001/chathub'
 };
 
 /*

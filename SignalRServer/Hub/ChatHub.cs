@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
+using SignalRServer.Models;
 
 namespace SignalRServer.Hub
 {
@@ -10,10 +11,8 @@ namespace SignalRServer.Hub
         // Тока не ржите...
 
         #region Authorization
-
         private static string _passwordHash = "pswd";
         private static HashSet<string> _authorizations;
-
         #endregion
 
         public ChatHub()
@@ -39,15 +38,17 @@ namespace SignalRServer.Hub
             }
         }
 
-        public async Task SendMessage(string connectionId, string userName, string message)
+        public async Task SendMessage(UserMessage message)
         {
-            if (!_authorizations.Contains(connectionId))
+            if (message.Text.Length > 100 || message.Text.Length < 1 ||
+                message.UserName.Length > 20 || message.UserName.Length < 1)
             {
-                await DenySendingMessage(userName);
+                await Clients.Caller.SendAsync("ReceiveMessage",
+                    new UserMessage {Text = "Чел ты", UserName = "System: "});
                 return;
             }
 
-            await Clients.All.SendAsync("SendMessage", connectionId, userName, message);
+            await Clients.All.SendAsync("ReceiveMessage", message);
         }
 
         private async Task DenySendingMessage(string userName)
