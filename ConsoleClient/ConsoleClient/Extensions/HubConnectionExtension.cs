@@ -16,7 +16,10 @@ namespace ConsoleClient.Extensions
 
         private static void AddOnSendMessage(HubConnection hubConnection)
         {
-            hubConnection.On<string, string, string>("SendMessage", TerminalChatClient.OnSendMessage);
+            hubConnection.On<string, string, string>("SendMessage", (connectionId, userName, message) =>
+            {
+                Console.WriteLine(userName);
+            });
         }
 
         private static void AddOnAuthorize(HubConnection hubConnection)

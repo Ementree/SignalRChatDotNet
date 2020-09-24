@@ -121,9 +121,9 @@ namespace ConsoleClient.Services
         }
         
 
-        public static void AddMessageToStorage(string userName, string message)
+        public static void AddMessageToStorage(string connectionId, string userName, string message)
         {
-            messageHistory.Add($"{userName} : {message}");
+            messageHistory.Add($"({connectionId}){userName} : {message}");
         }
 
         private static void SetNewCursorPosition(int newPositionLeft, int newPositionTop)

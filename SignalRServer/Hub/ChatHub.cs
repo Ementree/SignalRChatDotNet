@@ -50,7 +50,7 @@ namespace SignalRServer.Hub
             await Clients.All.SendAsync("SendMessage", connectionId, userName, message);
         }
 
-        public async Task DenySendingMessage(string userName)
+        private async Task DenySendingMessage(string userName)
         {
             await Clients.Caller.SendAsync("DenySendingMessage", $"Hey {userName}, you are not authorized!");
         }

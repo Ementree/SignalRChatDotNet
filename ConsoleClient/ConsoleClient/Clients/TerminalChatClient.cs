@@ -71,7 +71,9 @@ namespace ConsoleClient.Clients
 
         public static void OnSendMessage(string connectionId, string userName, string message)
         {
-            TerminalConfigurator.AddMessageToStorage(userName, message);
+            Console.WriteLine("----------");
+            
+            TerminalConfigurator.AddMessageToStorage(connectionId,userName, message);
         }
     }
 }
