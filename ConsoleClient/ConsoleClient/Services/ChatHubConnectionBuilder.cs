@@ -10,7 +10,7 @@ namespace ConsoleClient.Services
         public static HubConnection Build()
         {
             var connection = new HubConnectionBuilder()
-                .WithUrl(herokuServerUrl)
+                .WithUrl(localServerUrl)
                 .Build();
 
             return connection;

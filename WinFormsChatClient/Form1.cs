@@ -17,5 +17,9 @@ namespace WinFormsChatClient
             InitializeComponent();
         }
 
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            var message = this.textBox1.Text;
+        }
     }
 }

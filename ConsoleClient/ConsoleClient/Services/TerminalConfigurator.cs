@@ -122,7 +122,7 @@ namespace ConsoleClient.Services
 
             while (pressedKeyInfo.Key != ConsoleKey.Enter)
             {
-                //DisplayUpdate();
+                DisplayUpdate();
                 
                 Console.Clear();
                 ShowAllMessages();
@@ -186,7 +186,7 @@ namespace ConsoleClient.Services
         public static void Notify(UserMessage userMessage)
         {
             MessageHistory.Add($"{userMessage.UserName} : {userMessage.Text}");
-            //DisplayUpdate();
+            DisplayUpdate();
         }
 
         private static void SetNewCursorPosition(int newPositionLeft, int newPositionTop)
