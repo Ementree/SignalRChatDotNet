@@ -30,7 +30,7 @@ namespace SignalRServer.Controllers
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
                 {
                     Date = DateTime.Now.AddDays(index),
-                    TemperatureC = rng.Next(-20, 55),
+                    TemperatureC = -5,
                     Summary = Summaries[rng.Next(Summaries.Length)]
                 })
                 .ToArray();
