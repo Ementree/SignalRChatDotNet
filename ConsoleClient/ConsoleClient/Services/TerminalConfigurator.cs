@@ -49,9 +49,9 @@ namespace ConsoleClient.Services
 
         public static void Configure()
         {
-            //SetConsoleWindowSize(1, 1);
-            //SetConsoleWindowBufferSize(60, 30);
-            //SetConsoleWindowSize(60, 30);
+            SetConsoleWindowSize(1, 1);
+            SetConsoleWindowBufferSize(60, 30);
+            SetConsoleWindowSize(60, 30);
             Console.CursorVisible = false;
 
             _currentPositionLeft = Console.WindowWidth / 2;
