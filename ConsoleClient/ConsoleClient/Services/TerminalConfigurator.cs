@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Cryptography.Xml;
 using System.Text;
@@ -27,7 +28,8 @@ namespace ConsoleClient.Services
         private const string LeftVerticalSymbol = "|  ";
         private const string RightVerticalSymbol = "  |";
 
-        private static readonly List<string> MessageHistory;
+        //private static readonly List<string> MessageHistory;
+        private static readonly ObservableCollection<string> MessageHistory;
         private static readonly StringBuilder MessageStringBuilder;
         private static readonly string EnterMessage;
 
@@ -36,7 +38,7 @@ namespace ConsoleClient.Services
             _currentPositionLeft = Console.WindowWidth / 2;
             _currentPositionTop = Console.WindowHeight / 3;
 
-            MessageHistory = new List<string>();
+            MessageHistory = new ObservableCollection<string>();
             MessageStringBuilder = new StringBuilder();
 
             _messageBoxUpperLineOffset = Console.WindowHeight - MessageBoxUpperLineOffsetCount;
@@ -47,9 +49,9 @@ namespace ConsoleClient.Services
 
         public static void Configure()
         {
-            SetConsoleWindowSize(1, 1);
-            SetConsoleWindowBufferSize(60, 30);
-            SetConsoleWindowSize(60, 30);
+            //SetConsoleWindowSize(1, 1);
+            //SetConsoleWindowBufferSize(60, 30);
+            //SetConsoleWindowSize(60, 30);
             Console.CursorVisible = false;
 
             _currentPositionLeft = Console.WindowWidth / 2;
@@ -186,7 +188,10 @@ namespace ConsoleClient.Services
         public static void Notify(UserMessage userMessage)
         {
             MessageHistory.Add($"{userMessage.UserName} : {userMessage.Text}");
-            DisplayUpdate();
+            MessageHistory.CollectionChanged += (sender, args) =>
+            {
+                DisplayUpdate();
+            };
         }
 
         private static void SetNewCursorPosition(int newPositionLeft, int newPositionTop)

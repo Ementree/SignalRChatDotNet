@@ -16,11 +16,12 @@ namespace WinFormsChatClient
     {
         private HubConnection HubConnection;
 
-        private static readonly List<string> MessageHistory;
+        //private static readonly List<string> MessageHistory;
+        private static readonly ObservableCollection<string> MessageHistory;
 
         static ChatForm()
         {
-            MessageHistory = new List<string>();
+            MessageHistory = new ObservableCollection<string>();
         }
 
         public ChatForm()
@@ -39,8 +40,10 @@ namespace WinFormsChatClient
         private void UpdateMessageHistory(UserMessage userMessage)
         {
             MessageHistory.Add($"{userMessage.UserName} : {userMessage.Text}");
-
-            ShowMessages();
+            MessageHistory.CollectionChanged += (sender, args) =>
+            {
+                ShowMessages();
+            };
         }
 
         private void ShowMessages()
